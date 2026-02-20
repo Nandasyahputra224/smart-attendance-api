@@ -4,7 +4,7 @@ CREATE TABLE `Users` (
     `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
-    `role` ENUM('Admin', 'Mekanik') NOT NULL DEFAULT 'Admin',
+    `role` ENUM('Admin', 'Dosen') NOT NULL DEFAULT 'Admin',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

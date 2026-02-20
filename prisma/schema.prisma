@@ -21,19 +21,48 @@ model Users {
   role               Role                 @default(Admin)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  PasswordResetToken PasswordResetToken[]
+  // PasswordResetToken PasswordResetToken[]
 }
 
-model PasswordResetToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      Users    @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
+// model PasswordResetToken {
+//   id        String   @id @default(uuid())
+//   token     String   @unique
+//   userId    String
+//   user      Users    @relation(fields: [userId], references: [id])
+//   expiresAt DateTime
+//   createdAt DateTime @default(now())
+// } 
 
 enum Role {
   Admin
-  Mekanik
+  Dosen
 }
+
+
+model Students{
+  id String @id @default(uuid())
+  name String 
+  nim String @db.VarChar(11)
+  uid String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+
+  attendance Attendance[]  
+}
+
+model Attendance {
+  id String @id @default(uuid())
+  studentId String
+  scanTime DateTime @default(now())
+  status Status @default(Hadir)
+
+  students Students @relation(fields: [studentId], references: [id])
+
+}
+
+enum Status {
+  Hadir
+  Telat
+}
+
+

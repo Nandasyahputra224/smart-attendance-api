@@ -13,6 +13,7 @@ export const authUser = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     const decode = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decode;
+
     next();
   } catch (err) {
     console.log(err);
