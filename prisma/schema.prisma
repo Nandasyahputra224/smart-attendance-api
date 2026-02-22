@@ -42,7 +42,7 @@ enum Role {
 model Students{
   id String @id @default(uuid())
   name String 
-  nim String @db.VarChar(11)
+  nim String
   uid String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
