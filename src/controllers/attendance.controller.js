@@ -3,8 +3,6 @@ import { StatusCodes } from "http-status-codes";
 
 export const scanAttendance = async (req, res) => {
   try {
-    console.log("=== REQUEST MASUK ===");
-    console.log("Body:", req.body);
 
     const { uid } = req.body;
 
