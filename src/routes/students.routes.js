@@ -11,14 +11,14 @@ import {
 const routes = express.Router();
 const routesObject = [
   {
+    method: "get",
+    path: "/",
+    handler: [listStudents],
+  },
+  {
     method: "post",
     path: "/add",
     handler: [createStudent],
-  },
-  {
-    method: "get",
-    path: "/list",
-    handler: [listStudents],
   },
   {
     method: "get",

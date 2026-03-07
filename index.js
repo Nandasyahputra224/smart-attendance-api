@@ -22,7 +22,7 @@ const app = express();
 // };
 
 // app.use(cors(corsOptions));
-
+app.use(express.json());
 app.use(cors());
 
 app.use(urlencoded({ extended: true }));
@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 app.use("/", routes);
 app.use("/api/auth", authRouter);
 app.use("/api/students", studentsRouter);
-app.use("/api/attend", attendanceRouter);
+app.use("/api/attendance", attendanceRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, "0.0.0.0", () => {

@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 
 export const scanAttendance = async (req, res) => {
   try {
-
     const { uid } = req.body;
 
     if (!uid) {
@@ -24,8 +23,48 @@ export const scanAttendance = async (req, res) => {
       });
     }
 
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    const PRESENT_START_HOUR = 7;
+    const PRESENT_END_HOUR = 8;
+    const PRESENT_END_MINUTE = 15;
+
+    const isPresent =
+      hours > PRESENT_START_HOUR || hours === PRESENT_START_HOUR
+        ? hours < PRESENT_END_HOUR ||
+          (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE)
+        : false;
+
+    const status = isPresent ? "Hadir" : "Absen";
+
+    const startOfDelay = new Date(now);
+    startOfDelay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existingScan = await prisma.attendance.findFirst({
+      where: {
+        studentId: student.id,
+        scanTime: {
+          gte: startOfDelay,
+          lte: endOfDay,
+        },
+      },
+    });
+
+    if (existingScan) {
+      return res.status(StatusCodes.CONFLICT).json({
+        status: "error",
+        message: `${student.name} sudah melakukan scan hari ini`,
+      });
+    }
+
     await prisma.attendance.create({
       data: {
+        status: status,
         studentId: student.id,
       },
     });
@@ -33,6 +72,22 @@ export const scanAttendance = async (req, res) => {
     res.status(StatusCodes.CREATED).json({
       status: "success",
       name: student.name,
+      scaneStatus: status,
+    });
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Internal Server Error",
+      errors: err,
+    });
+  }
+};
+
+export const listAttendances = async (req, res) => {
+  try {
+    const attendance = await prisma.attendance.findMany();
+
+    res.status(StatusCodes.OK).json({
+      data: attendance,
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

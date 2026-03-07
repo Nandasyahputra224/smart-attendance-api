@@ -6,12 +6,23 @@ export const createStudent = async (req, res) => {
   try {
     const { name, nim, uid } = req.body;
 
+    const uidExists = await prisma.students.findUnique({
+      where: { uid },
+    });
+
+    const nimExists = await prisma.students.findFirst({
+      where: { nim },
+    });
+
+    if (uidExists || nimExists) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: uidExists ? "UID Already Exists!" : "NIM Already Exists!",
+      });
+    }
+
     const student = await prisma.students.create({
       data: { name, nim, uid },
     });
-
-    // if (!uid) {
-    // }
 
     res.status(StatusCodes.CREATED).json({
       message: "Additional Student Success",
@@ -62,7 +73,6 @@ export const detailStudent = async (req, res) => {
     };
 
     res.status(StatusCodes.OK).json({
-      message: "Get Detail Student Success",
       data: resFormatDate,
     });
   } catch (err) {
@@ -88,10 +98,49 @@ export const updateStudent = async (req, res) => {
       });
     }
 
-    if ((nim && nim == student.nim) || uid & (uid == student.uid)) {
+    const duplicate = await prisma.students.findFirst({
+      where: {
+        OR: [nim ? { nim } : undefined, uid ? { uid } : undefined].filter(
+          Boolean,
+        ),
+        NOT: { id },
+      },
+    });
+
+    if (duplicate) {
       return res.status(StatusCodes.CONFLICT).json({
-        message: "NIM or UID Already Exists",
+        message:
+          duplicate.nim === nim ? "NIM Already Exists" : "UID Already Exists",
       });
+    }
+    if (nim) {
+      const nimExists = await prisma.students.findFirst({
+        where: {
+          nim: nim,
+          NOT: { id: id },
+        },
+      });
+
+      if (nimExists) {
+        return res.status(StatusCodes.CONFLICT).json({
+          message: "NIM Already Exists",
+        });
+      }
+    }
+
+    if (uid) {
+      const uidExists = await prisma.students.findFirst({
+        where: {
+          uid: uid,
+          NOT: { id: id },
+        },
+      });
+
+      if (uidExists) {
+        return res.status(StatusCodes.CONFLICT).json({
+          message: "UID Already Exists",
+        });
+      }
     }
 
     const studentUpdate = await prisma.students.update({
@@ -110,16 +159,17 @@ export const updateStudent = async (req, res) => {
       },
     });
 
-    const resFormatDate = {
+    const resUpdate = {
       ...studentUpdate,
       updatedAt: formatDate(studentUpdate.updatedAt),
     };
 
     res.status(StatusCodes.OK).json({
       message: "Update Student Success",
-      data: resFormatDate,
+      data: resUpdate,
     });
   } catch (err) {
+    console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Internal Server Error",
       errors: err,
