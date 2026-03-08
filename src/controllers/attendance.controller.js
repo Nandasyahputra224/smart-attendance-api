@@ -1,6 +1,7 @@
 import { Status } from "@prisma/client";
 import prisma from "../config/prisma.js";
 import { StatusCodes } from "http-status-codes";
+import { getWIBTime } from "../utils/formatDate.js";
 
 export const scanAttendance = async (req, res) => {
   try {
@@ -39,7 +40,6 @@ export const scanAttendance = async (req, res) => {
 
     const startOfDay = new Date(now);
     startOfDay.setHours(0, 0, 0, 0);
-
     const endOfDay = new Date(now);
     endOfDay.setHours(23, 59, 59, 999);
 
@@ -72,7 +72,6 @@ export const scanAttendance = async (req, res) => {
       status: status,
     });
   } catch (err) {
-    console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Internal Server Error",
       errors: err,
