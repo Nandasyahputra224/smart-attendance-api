@@ -1,5 +1,13 @@
+import { Status } from "@prisma/client";
 import prisma from "../config/prisma.js";
 import { StatusCodes } from "http-status-codes";
+
+const getMockTime = () => {
+  return {
+    hours: 8,
+    minutes: 10,
+  };
+};
 
 export const scanAttendance = async (req, res) => {
   try {
@@ -37,7 +45,7 @@ export const scanAttendance = async (req, res) => {
           (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE)
         : false;
 
-    const status = isPresent ? "Hadir" : "Absen";
+    const status = isPresent ? Status.Hadir : Status.Absen;
 
     const startOfDelay = new Date(now);
     startOfDelay.setHours(0, 0, 0, 0);
@@ -70,11 +78,11 @@ export const scanAttendance = async (req, res) => {
     });
 
     res.status(StatusCodes.CREATED).json({
-      status: "success",
       name: student.name,
-      scaneStatus: status,
+      status: status,
     });
   } catch (err) {
+    console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Internal Server Error",
       errors: err,
