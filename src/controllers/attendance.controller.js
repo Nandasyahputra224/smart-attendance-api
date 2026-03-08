@@ -24,25 +24,21 @@ export const scanAttendance = async (req, res) => {
       });
     }
 
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
+    const { now, hours, minutes } = getWIBTime();
 
-    // const PRESENT_START_HOUR = 7;
-    // const PRESENT_END_HOUR = 8;
-    // const PRESENT_END_MINUTE = 15;
+    const PRESENT_START_HOUR = 7;
+    const PRESENT_END_HOUR = 8;
+    const PRESENT_END_MINUTE = 15;
 
     const isPresent =
-      hours >= 7 && (hours < 8 || (hours === 8 && minutes <= 15));
-    // hours > PRESENT_START_HOUR || hours === PRESENT_START_HOUR
-    //   ? hours < PRESENT_END_HOUR ||
-    //     (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE)
-    //   : false;
+      hours >= PRESENT_START_HOUR &&
+      (hours < PRESENT_END_HOUR ||
+        (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE));
 
     const status = isPresent ? Status.Hadir : Status.Absen;
 
-    const startOfDelay = new Date(now);
-    startOfDelay.setHours(0, 0, 0, 0);
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(now);
     endOfDay.setHours(23, 59, 59, 999);
@@ -51,7 +47,7 @@ export const scanAttendance = async (req, res) => {
       where: {
         studentId: student.id,
         scanTime: {
-          gte: startOfDelay,
+          gte: startOfDay,
           lte: endOfDay,
         },
       },
