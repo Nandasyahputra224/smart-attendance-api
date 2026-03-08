@@ -2,13 +2,6 @@ import { Status } from "@prisma/client";
 import prisma from "../config/prisma.js";
 import { StatusCodes } from "http-status-codes";
 
-const getMockTime = () => {
-  return {
-    hours: 8,
-    minutes: 10,
-  };
-};
-
 export const scanAttendance = async (req, res) => {
   try {
     const { uid } = req.body;
