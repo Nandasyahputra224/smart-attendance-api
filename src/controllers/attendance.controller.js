@@ -28,15 +28,16 @@ export const scanAttendance = async (req, res) => {
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
-    const PRESENT_START_HOUR = 7;
-    const PRESENT_END_HOUR = 8;
-    const PRESENT_END_MINUTE = 15;
+    // const PRESENT_START_HOUR = 7;
+    // const PRESENT_END_HOUR = 8;
+    // const PRESENT_END_MINUTE = 15;
 
     const isPresent =
-      hours > PRESENT_START_HOUR || hours === PRESENT_START_HOUR
-        ? hours < PRESENT_END_HOUR ||
-          (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE)
-        : false;
+      hours >= 7 && (hours < 8 || (hours === 8 && minutes <= 15));
+    // hours > PRESENT_START_HOUR || hours === PRESENT_START_HOUR
+    //   ? hours < PRESENT_END_HOUR ||
+    //     (hours === PRESENT_END_HOUR && minutes <= PRESENT_END_MINUTE)
+    //   : false;
 
     const status = isPresent ? Status.Hadir : Status.Absen;
 
